@@ -2,17 +2,20 @@ package showcase;
 
 import org.junit.*;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.rules.Timeout;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
-import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.*;
 import org.openqa.selenium.remote.CapabilityType;
 
+
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -20,9 +23,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pages.SamplePagePO;
-import utils.WrapperFunctions;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 import static utils.WrapperFunctions.saveScreenCapture;
 
 
@@ -37,7 +40,6 @@ import static utils.WrapperFunctions.saveScreenCapture;
 */
 
 public class SamplePageTest {
-
 
     private static final String chromeDriverPath = "C:\\Testing_Tools\\WebDriver\\chromedriver.exe";
     private static RemoteWebDriver driver = null;
@@ -61,7 +63,7 @@ public class SamplePageTest {
     }
 
     @Before
-    public void createDriver() {
+    public void createDriver() throws MalformedURLException {
         /* Assemble Driver Specific Options */
         ChromeOptions options = new ChromeOptions();
         // Used as Environment Variable by the SUT
@@ -79,14 +81,16 @@ public class SamplePageTest {
         options.setCapability(CapabilityType.LOGGING_PREFS, logs);
 
 
-        /* Create The Remote Web Driver that Connects to the Service Driver */
-        driver = new RemoteWebDriver(service.getUrl(), options);
-
+        /* Use local Remote Web Driver that Connects to the Service Driver */
+        //driver = new RemoteWebDriver(service.getUrl(), options);
+        
+        /* Use docker-selenium at localhost:4449 */
+        driver = new RemoteWebDriver(new URL("http://localhost:4449/wd/hub"), options);
         // Use implicit timeout to poll element for x amount of time
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
-        log.info("Remote, Chrome Driver: " +
-                "Create and Connect new Chrome Driver via Service");
+        //log.info("Remote, Chrome Driver: " +
+        //        "Create and Connect new Chrome Driver via Service");
     }
 
     @After
@@ -101,18 +105,19 @@ public class SamplePageTest {
             }
         }
         catch (Exception e) {
-            System.out.println("ERROR: Unable to show output of logs"  + e);
+            //System.out.println("ERROR: Unable to show output of logs"  + e);
+            log.error("ERROR: Unable to show output of logs"  + e);
         }
 
         driver.quit();
-        log.info("Remote, Chrome Driver: Quit Chrome Driver was Called");
+        //log.info("Remote, Chrome Driver: Quit Chrome Driver was Called");
     }
 
     //region GenerateAlertBox
 
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Generates an Alert Box")
-    public void SamplePage_GenerateAlertBox_ButtonClicked_AlertBoxIsShown() {
+    public void SamplePage_GenerateAlertBox_ButtonClicked_AlertBoxIsShown() throws InterruptedException {
 
         log.info("TEST CASE: Generate Alert Box");
 
@@ -122,16 +127,17 @@ public class SamplePageTest {
 
         /* Act */
         samplePage.generateAlertBox();
+        TimeUnit.MILLISECONDS.sleep(200);
         modalDialogSeen = samplePage.alertBoxIsPresent();
         // Alert Box shall be closed before interacting with driver again
         samplePage.dismissAlertBox();
 
         /* Assert */
         // Alert Box is visible
-        Assert.assertTrue(modalDialogSeen);
+        assertTrue(modalDialogSeen);
     }
 
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Alert Box is Accepted and Closed")
     public void SamplePage_GenerateAlertBox_AcceptAlert_AlertBoxIsClosed() {
 
@@ -154,10 +160,10 @@ public class SamplePageTest {
 
         /* Assert */
         // Alert Box is closed
-        Assert.assertFalse(samplePage.alertBoxIsPresent());
+        assertFalse(samplePage.alertBoxIsPresent());
     }
 
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Alert Box Text is Correct")
     public void SamplePage_GenerateAlertBox_GetText_TextIsCorrect() {
 
@@ -176,13 +182,12 @@ public class SamplePageTest {
 
         /* Assert */
         // Alert Box text is as expected
-        Assert.assertThat(actualText, containsString(expected));
-        Assert.assertEquals(actualText, expected);
+        assertEquals(actualText, expected);
     }
     //endregion
 
     //region GenerateConfirmBox
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Generates a Confirm Box")
     public void SamplePage_GenerateConfirmBox_ButtonClicked_ConfirmBoxIsShown() {
 
@@ -201,11 +206,11 @@ public class SamplePageTest {
 
         /* Assert */
         // Confirm Box is visible
-        Assert.assertTrue(modalDialogSeen);
+        assertTrue(modalDialogSeen);
     }
 
 
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Confirm box text is correct")
     public void SamplePage_GenerateConfirmBox_GetText_TextIsCorrect() {
 
@@ -223,12 +228,11 @@ public class SamplePageTest {
 
         /* Assert */
         // Text is as Expected
-        Assert.assertThat(actualText, containsString(expected));
-        Assert.assertEquals(actualText, expected);
+        assertEquals(actualText, expected);
     }
 
 
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Confirm box is accepted and closed")
     public void SamplePage_GenerateConfirmBox_Accept_BoxClosed() {
 
@@ -250,10 +254,10 @@ public class SamplePageTest {
         }
 
         /* Assert */
-        Assert.assertFalse(samplePage.confirmBoxIsPresent());
+        assertFalse(samplePage.confirmBoxIsPresent());
     }
 
-    @Test(timeout = 6000)
+    @Test
     @DisplayName("Sample Page: Confirm box is dismissed and closed")
     public void SamplePage_GenerateConfirmBox_Dismiss_BoxClosed() {
 
@@ -275,7 +279,7 @@ public class SamplePageTest {
         }
 
         /* Assert */
-        Assert.assertFalse(samplePage.confirmBoxIsPresent());
+        assertFalse(samplePage.confirmBoxIsPresent());
     }
 
     //endregion
