@@ -1,4 +1,5 @@
-# Showcase: Selenium Remote and docker-selenium
+# Showcase: 
+## Selenium Remote and docker-selenium
 
 ### Purpose
 The purpose of this project is to showcase a selenium RemoteWebDriver
@@ -7,12 +8,13 @@ to execute tests on a webpage.
 
 
 ### Scope
-The showcase contains tests that are designed to target some of the
-webelements on a referenced [sample page][1]
+The showcase contains tests designed to target some of the
+webelements on this [sample page][1]
 
 
 #### Project File Structure 
-The project is structured as a Maven projected, with the page object model files and related aggregate functions located in the main branch, and the tests are kept in the corresponding test branch, as illustrated in [Figure1][Figure1] 
+This project is structured as a Maven project, i.e. it has as a main branch and a corresponding test branch. 
+The page object model files and related aggregate functions are located in the main branch. The tests in SamplePageTest.java is contained in the test branch as illustrated in [Figure1][Figure1] 
 ``` bash 
 src
     +---main
@@ -51,13 +53,16 @@ Figure1
 
 ### Preparation
 
-1. Placement of External Files 
+1. Location for External Files 
     * Place chromedriver.exe at location "C:\Testing_Tools\WebDriver\chromedriver.exe"
 
 2. Start docker-selenium Container
     ``` bash
     # Start Selenium stand-alone container (Config: 2GB shared memory @ localhost:4449)
-    $ docker container run --name selenium-solo -d -p 4449:4444 --shm-size 2g selenium/standalone-chrome:4.0.0-beta-1-prerelease-20210128
+    $ docker container run --name selenium-solo -d -p 4449:4444 --shm-size 2g --rm selenium/standalone-chrome:4.0.0-beta-1-prerelease-20210128
+
+    # Check that it is running
+    $ docker container inspect --format='{{.State.Status}}' selenium-solo
     ```
 
 
@@ -93,17 +98,20 @@ Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
 ### Clean-up
 
 1. Clean project files by maven
-``` bash
-mvn clean
-```
+    ``` bash
+    mvn clean
+    ```
 2. Stop Selenium Container
-``` bash
-# Stop Selenium stand-alone container
-$ docker container kill selenium-solo
+    ``` bash
+    # Stop Selenium stand-alone container
+    $ docker container kill selenium-solo
 
-# Check that Selenium stand-alone container is stopped
-$ docker container ps
-```
+    # Check that Selenium stand-alone container is stopped
+    $ docker container ps
+
+    # Check that it is not dangling (Expected to not find 'selenium-solo')
+    $ docker container ls -a | grep selenium*
+    ```
 
 #### To-Do
 Trivial
