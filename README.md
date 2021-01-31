@@ -1,5 +1,4 @@
-# Showcase: 
-## Selenium Remote and docker-selenium
+## Showcase - JUnit Tests + docker-selenium
 
 ### Purpose
 The purpose of this project is to showcase a selenium RemoteWebDriver
@@ -14,7 +13,7 @@ webelements on this [sample page][1]
 
 #### Project File Structure 
 This project is structured as a Maven project, i.e. it has as a main branch and a corresponding test branch. 
-The page object model files and related aggregate functions are located in the main branch. The tests in SamplePageTest.java is contained in the test branch as illustrated in [Figure1][Figure1] 
+The page object model files and related aggregate functions are located in the main branch. The tests in SamplePageTest.java is contained in the test branch as illustrated in *Figure1*
 ``` bash 
 src
     +---main
@@ -30,8 +29,7 @@ src
             \---showcase
                     SamplePageTest.java
 ```
-[Figure1]:Figure1
-Figure1
+*_Figure1_*
 
 
 ## Start Showcase
